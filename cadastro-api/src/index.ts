@@ -104,4 +104,19 @@ app.patch("/api/user/:id", (req, res) => {
    )
 })
 
+// DELETE
+app.delete("/api/user/:id", (req, res) => {
+   const sql = 'DELETE FROM user WHERE id = ?'
+   database.run(sql, [req.params.id],
+      function (this: RunResult, err) {
+         if (err) {
+            res.status(400).json({ "error": err.message })
+            return;
+         }
+
+         res.json({ "message": "deleted", changes: this.changes })
+      }
+   )
+})
+
 app.listen(port, () => console.log(`⚡ servidor ${port}`))
