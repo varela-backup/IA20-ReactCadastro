@@ -4,6 +4,7 @@ import database from "./database"
 
 const port = 8080
 const app = express()
+const session: any = {}
 
 // 
 app.use(express.json())
@@ -131,15 +132,22 @@ app.post("/api/login/", (req, res) => {
          return;
       }
 
-      res.json({
-         "message": "success",
-         "data": row ?? "none"
+      if (!row?.id) {
+         res.status(404).json({ "message": "user not found!" })
+         return
+      }
+
+      require('crypto').randomBytes(48, (err: any, buffer: any) => {
+         const token = buffer.toString('hex')
+         session[token] = row
+         res.json({ "message": "success", "sesid": token })
       })
    })
-
 })
 
-
+app.post("/api/logged/:sesid", (req, res) => {
+   res.json(session[req.params.sesid] || "nada")
+})
 
 
 
